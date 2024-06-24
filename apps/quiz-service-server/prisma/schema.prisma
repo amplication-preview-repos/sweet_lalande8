@@ -1,0 +1,85 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Teacher {
+  createdAt DateTime @default(now())
+  email     String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  password  String?
+  updatedAt DateTime @updatedAt
+}
+
+model Student {
+  createdAt DateTime   @default(now())
+  email     String?
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  password  String?
+  responses Response[]
+  updatedAt DateTime   @updatedAt
+}
+
+model Quiz {
+  createdAt   DateTime   @default(now())
+  description String?
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  published   Boolean?
+  responses   Response[]
+  timeLimit   Int?
+  title       String?
+  updatedAt   DateTime   @updatedAt
+}
+
+model Choice {
+  choiceText String?
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  isCorrect  Boolean?
+  question   Question? @relation(fields: [questionId], references: [id])
+  questionId String?   @db.ObjectId
+  updatedAt  DateTime  @updatedAt
+}
+
+model Response {
+  createdAt       DateTime @default(now())
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  isCorrect       Boolean?
+  quiz            Quiz?    @relation(fields: [quizId], references: [id])
+  quizId          String?  @db.ObjectId
+  student         Student? @relation(fields: [studentId], references: [id])
+  studentId       String?  @db.ObjectId
+  submittedAnswer String?
+  updatedAt       DateTime @updatedAt
+}
+
+model Question {
+  choices      Choice[]
+  createdAt    DateTime                  @default(now())
+  id           String                    @id @default(auto()) @map("_id") @db.ObjectId
+  questionText String?
+  questionType EnumQuestionQuestionType?
+  updatedAt    DateTime                  @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumQuestionQuestionType {
+  Option1
+}
